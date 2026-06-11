@@ -1,0 +1,47 @@
+import { Link, NavLink } from 'react-router-dom'
+import { useStore } from '../store'
+import { Avatar } from './ui'
+
+export function Navbar() {
+  const { data, currentUser } = useStore()
+  const pendingForMe = data.applications.filter(
+    (a) =>
+      a.status === 'pending' &&
+      data.projects.some((p) => p.id === a.projectId && p.ownerId === currentUser.id),
+  ).length
+
+  return (
+    <header className="navbar">
+      <div className="container navbar-inner">
+        <Link to="/" className="brand">
+          <span className="brand-mark">👋</span>
+          Shoulder Tap
+        </Link>
+        <nav className="nav-links">
+          <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+            Discover
+          </NavLink>
+          <NavLink to="/people" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+            People
+          </NavLink>
+          <NavLink to="/dashboard" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+            Dashboard
+            {pendingForMe > 0 && (
+              <span className="notif-badge" style={{ marginLeft: 7 }}>
+                {pendingForMe}
+              </span>
+            )}
+          </NavLink>
+        </nav>
+        <div className="nav-right">
+          <Link to="/new" className="btn btn-primary btn-sm">
+            + Post a project
+          </Link>
+          <Link to={`/people/${currentUser.id}`} aria-label="My profile">
+            <Avatar user={currentUser} size={36} />
+          </Link>
+        </div>
+      </div>
+    </header>
+  )
+}
