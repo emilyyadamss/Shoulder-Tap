@@ -187,7 +187,7 @@ export function Tools() {
           <p>Borrow a 3D printer, a welder, or a whole woodshop from people nearby.</p>
         </div>
         <button className="btn btn-primary" onClick={() => setSharing(true)}>
-          + Share a tool
+          Share a tool
         </button>
       </div>
 

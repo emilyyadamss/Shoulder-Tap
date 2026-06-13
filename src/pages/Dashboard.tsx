@@ -19,7 +19,7 @@ export function Dashboard() {
           <p>Your projects, your applications, all in one place.</p>
         </div>
         <Link to="/new" className="btn btn-primary">
-          + Post a project
+          Post a project
         </Link>
       </div>
 
@@ -79,7 +79,7 @@ export function Dashboard() {
                 <Link to="/" style={{ textDecoration: 'underline' }}>
                   Browse projects
                 </Link>{' '}
-                that need your skills — try the “Matches my skills” filter.
+                that need your skills, try the “Matches my skills” filter.
               </p>
             </EmptyState>
           </div>

@@ -85,7 +85,7 @@ export function Discover() {
           Great projects are missing <em>one person.</em> Maybe you.
         </h1>
         <p>
-          Post what you're building and the roles you need — or tap a project on the shoulder and
+          Post what you're building and the roles you need. Or tap a project on the shoulder and
           offer the skills you have. {totalOpen} open roles right now.
         </p>
       </section>
@@ -96,7 +96,7 @@ export function Discover() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search projects, roles, or skills — try “mechanical engineer”"
+            placeholder="Search projects, roles, or skills. Maybe “mechanical engineer”"
             aria-label="Search projects"
           />
         </div>

@@ -38,7 +38,7 @@ export function Navbar() {
         </nav>
         <div className="nav-right">
           <Link to="/new" className="btn btn-primary btn-sm">
-            + Post a project
+            Post a project
           </Link>
           <Link to={`/people/${currentUser.id}`} aria-label="My profile">
             <Avatar user={currentUser} size={36} />
