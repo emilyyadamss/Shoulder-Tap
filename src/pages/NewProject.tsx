@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { uid, useStore } from '../store'
 import { CATEGORIES, SKILL_SUGGESTIONS } from '../data/seed'
+import { WORK_MODES } from '../components/ui'
+import type { WorkMode } from '../types'
 
 interface RoleDraft {
   key: string
@@ -9,10 +11,11 @@ interface RoleDraft {
   description: string
   skills: string[]
   slots: number
+  workMode: WorkMode
 }
 
 function emptyRole(): RoleDraft {
-  return { key: uid('rd'), title: '', description: '', skills: [], slots: 1 }
+  return { key: uid('rd'), title: '', description: '', skills: [], slots: 1, workMode: 'remote' }
 }
 
 export function NewProject() {
@@ -66,9 +69,10 @@ export function NewProject() {
         skills: r.skills,
         slots: Math.max(1, r.slots),
         filledBy: [],
+        workMode: r.workMode,
       })),
     })
-    notify('Project posted — good luck! 🚀')
+    notify('Project posted — good luck!')
     navigate(`/projects/${project.id}`)
   }
 
@@ -180,6 +184,22 @@ export function NewProject() {
                 onChange={(e) => patchRole(role.key, { description: e.target.value })}
                 placeholder="One or two sentences about the work."
               />
+            </div>
+            <div className="field">
+              <label>Where is this role based?</label>
+              <div className="segmented">
+                {WORK_MODES.map((m) => (
+                  <button
+                    key={m.value}
+                    type="button"
+                    className={`segmented-option${role.workMode === m.value ? ' selected' : ''}`}
+                    aria-pressed={role.workMode === m.value}
+                    onClick={() => patchRole(role.key, { workMode: m.value })}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="field" style={{ marginBottom: 0 }}>
               <label>Skills to match on</label>

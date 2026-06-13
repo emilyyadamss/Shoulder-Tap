@@ -3,7 +3,7 @@ import { useStore } from '../store'
 import { Avatar } from './ui'
 
 export function Navbar() {
-  const { data, currentUser } = useStore()
+  const { data, currentUser, signOut, notify } = useStore()
   const pendingForMe = data.applications.filter(
     (a) =>
       a.status === 'pending' &&
@@ -14,7 +14,7 @@ export function Navbar() {
     <header className="navbar">
       <div className="container navbar-inner">
         <Link to="/" className="brand">
-          <span className="brand-mark">👋</span>
+          <span className="brand-mark" aria-hidden="true" />
           Shoulder Tap
         </Link>
         <nav className="nav-links">
@@ -23,6 +23,9 @@ export function Navbar() {
           </NavLink>
           <NavLink to="/people" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
             People
+          </NavLink>
+          <NavLink to="/tools" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+            Tools
           </NavLink>
           <NavLink to="/dashboard" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
             Dashboard
@@ -40,6 +43,15 @@ export function Navbar() {
           <Link to={`/people/${currentUser.id}`} aria-label="My profile">
             <Avatar user={currentUser} size={36} />
           </Link>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              signOut()
+              notify('Signed out', 'info')
+            }}
+          >
+            Sign out
+          </button>
         </div>
       </div>
     </header>

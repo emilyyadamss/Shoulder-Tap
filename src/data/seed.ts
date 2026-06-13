@@ -10,74 +10,106 @@ export function makeSeedData(): AppData {
       {
         id: 'u-emily',
         name: 'Emily Adams',
+        email: 'emily@shouldertap.dev',
         headline: 'Full-stack Software Engineer',
         location: 'Portsmouth, NH',
         bio: 'I like building things end to end — from schema to pixels. Happiest on small, scrappy teams shipping something real. Looking to lend a hand on hardware or climate projects.',
         skills: ['Software Engineering', 'TypeScript', 'React', 'Node.js', 'UI Design'],
+        interests: ['Climate Tech', 'Hardware', 'Open Source', 'Trail Running'],
+        school: 'University of New Hampshire — BS Computer Science',
         hue: 16,
       },
       {
         id: 'u-marcus',
         name: 'Marcus Okafor',
+        email: 'marcus@shouldertap.dev',
         headline: 'Mechanical Engineer · Ex-SpaceX',
         location: 'Los Angeles, CA',
         bio: 'Ten years designing structures and mechanisms that have to survive the real world. I love early-stage projects where the CAD file is still a napkin sketch.',
         skills: ['Mechanical Engineering', 'CAD', 'FEA', 'Prototyping', '3D Printing'],
+        interests: ['Space', 'Robotics', 'Ocean Conservation'],
+        school: 'University of Michigan — BSE Mechanical Engineering',
         hue: 210,
       },
       {
         id: 'u-priya',
         name: 'Priya Raman',
+        email: 'priya@shouldertap.dev',
         headline: 'Embedded Systems Engineer',
         location: 'Austin, TX',
         bio: 'Firmware, PCBs, and anything with a microcontroller in it. I have bricked more dev boards than I can count and learned something every time.',
         skills: ['Embedded Systems', 'Electrical Engineering', 'C/C++', 'PCB Design', 'RTOS'],
+        interests: ['Open Source', 'Ham Radio', 'Outdoors'],
+        school: 'UT Austin — MS Electrical & Computer Engineering',
         hue: 280,
       },
       {
         id: 'u-sofia',
         name: 'Sofia Marchetti',
+        email: 'sofia@shouldertap.dev',
         headline: 'Industrial & Product Designer',
         location: 'Brooklyn, NY',
         bio: 'I design objects people actually want to live with. Strong opinions about radii. Open to collaborating on hardware that deserves a beautiful enclosure.',
         skills: ['Industrial Design', 'UI Design', 'Figma', 'Rendering', 'User Research'],
+        interests: ['Art & Design', 'Ceramics', 'Sustainable Materials'],
+        school: 'Pratt Institute — BID Industrial Design',
         hue: 330,
       },
       {
         id: 'u-dav',
         name: 'David Chen',
+        email: 'david@shouldertap.dev',
         headline: 'Machine Learning Engineer',
         location: 'Seattle, WA',
         bio: 'I build models that run on real hardware with real constraints. Previously speech recognition at a big company; now I want to work on things I can point at.',
         skills: ['Machine Learning', 'Python', 'Computer Vision', 'Software Engineering', 'Edge AI'],
+        interests: ['Edge AI', 'Privacy', 'Hiking'],
+        school: 'University of Washington — PhD Computer Science',
         hue: 150,
       },
       {
         id: 'u-amara',
         name: 'Amara Diallo',
+        email: 'amara@shouldertap.dev',
         headline: 'Civil & Structural Engineer',
         location: 'Chicago, IL',
         bio: 'Bridges, foundations, and load paths. I volunteer with disaster-relief rebuilds and want to bring structural rigor to community projects.',
         skills: ['Civil Engineering', 'Structural Analysis', 'AutoCAD', 'Project Management'],
+        interests: ['Disaster Relief', 'Civic Tech'],
+        school: 'Northwestern University — MS Civil Engineering',
         hue: 45,
       },
       {
         id: 'u-leo',
         name: 'Leo Tanaka',
+        email: 'leo@shouldertap.dev',
         headline: 'Biomedical Engineer & Tinkerer',
         location: 'San Diego, CA',
         bio: 'Medical devices by day, open-source prosthetics by night. Comfortable anywhere between a 510(k) submission and a soldering iron.',
         skills: ['Biomedical Engineering', 'Regulatory', 'Prototyping', 'Electrical Engineering'],
+        interests: ['Accessibility', 'Open Source', '3D Printing'],
         hue: 190,
       },
       {
         id: 'u-hannah',
         name: 'Hannah Berg',
+        email: 'hannah@shouldertap.dev',
         headline: 'Growth Marketer & Writer',
         location: 'Denver, CO',
         bio: 'I help technical teams explain what they built and find the people who need it. Words, launches, and landing pages.',
         skills: ['Marketing', 'Copywriting', 'Branding', 'Community Building'],
+        school: 'Colorado State University — BA Journalism',
         hue: 95,
+      },
+      {
+        id: 'u-nate',
+        name: 'Nate Sullivan',
+        email: 'nate@shouldertap.dev',
+        headline: 'Community Makerspace Organizer',
+        location: 'Boston, MA',
+        bio: 'I run a volunteer-powered workshop on the waterfront. I can find a donated bandsaw anywhere in New England; now I need engineers to help put it all to work.',
+        skills: ['Project Management', 'Community Building', 'Prototyping'],
+        hue: 250,
       },
     ],
     projects: [
@@ -93,6 +125,7 @@ export function makeSeedData(): AppData {
         roles: [
           {
             id: 'r-coralbot-embedded',
+            workMode: 'hybrid',
             title: 'Embedded Systems Engineer',
             description: 'Own the thruster and manipulator control firmware. STM32-based, RTOS experience a plus.',
             skills: ['Embedded Systems', 'C/C++', 'RTOS'],
@@ -101,6 +134,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-coralbot-cv',
+            workMode: 'remote',
             title: 'Computer Vision Engineer',
             description: 'Build the substrate-detection model that tells the operator where it is safe to plant. Must run on a Jetson.',
             skills: ['Machine Learning', 'Computer Vision', 'Edge AI'],
@@ -109,6 +143,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-coralbot-sw',
+            workMode: 'remote',
             title: 'Software Engineer',
             description: 'Topside operator console: live video, telemetry, and mission logging. Web stack preferred.',
             skills: ['Software Engineering', 'TypeScript', 'React'],
@@ -131,6 +166,7 @@ export function makeSeedData(): AppData {
         roles: [
           {
             id: 'r-openhand-mech',
+            workMode: 'remote',
             title: 'Mechanical Engineer',
             description: 'Redesign the finger linkage for side-load stiffness without adding weight. DFM for 3D printing.',
             skills: ['Mechanical Engineering', 'CAD', '3D Printing'],
@@ -139,6 +175,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-openhand-ee',
+            workMode: 'remote',
             title: 'Electrical Engineer',
             description: 'Shrink the control board to fit inside the palm. 4-layer PCB, battery management, EMG front-end.',
             skills: ['Electrical Engineering', 'PCB Design'],
@@ -147,6 +184,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-openhand-writer',
+            workMode: 'remote',
             title: 'Technical Writer',
             description: 'Turn our build notes into an assembly guide a clinic technician can follow without us on a video call.',
             skills: ['Copywriting', 'Documentation'],
@@ -169,6 +207,7 @@ export function makeSeedData(): AppData {
         roles: [
           {
             id: 'r-stack-mech',
+            workMode: 'remote',
             title: 'Mechanical Engineer',
             description: 'Take the design from pretty renders to injection-moldable parts with proper draft angles and seals.',
             skills: ['Mechanical Engineering', 'CAD', 'DFM'],
@@ -177,6 +216,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-stack-embedded',
+            workMode: 'hybrid',
             title: 'Embedded Systems Engineer',
             description: 'ESP32 base station: pump control, water level and EC sensing, BLE to the app.',
             skills: ['Embedded Systems', 'Electrical Engineering'],
@@ -185,6 +225,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-stack-mobile',
+            workMode: 'remote',
             title: 'Software Engineer',
             description: 'A friendly companion app — watering reminders, plant guides, tower setup over BLE.',
             skills: ['Software Engineering', 'React', 'TypeScript'],
@@ -207,6 +248,7 @@ export function makeSeedData(): AppData {
         roles: [
           {
             id: 'r-quake-sw',
+            workMode: 'remote',
             title: 'Software Engineer',
             description: 'Offline-first mobile app: guided checklist, photo capture, sync when connectivity returns.',
             skills: ['Software Engineering', 'TypeScript', 'React'],
@@ -215,6 +257,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-quake-ml',
+            workMode: 'remote',
             title: 'Machine Learning Engineer',
             description: 'Train and ship the crack/damage classifier. Needs to run on-device on mid-range Android phones.',
             skills: ['Machine Learning', 'Computer Vision', 'Python'],
@@ -223,6 +266,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-quake-pm',
+            workMode: 'hybrid',
             title: 'Project Manager',
             description: 'Coordinate field pilots with our NGO partners and keep three volunteer teams pointed the same direction.',
             skills: ['Project Management', 'Community Building'],
@@ -245,6 +289,7 @@ export function makeSeedData(): AppData {
         roles: [
           {
             id: 'r-murmur-design',
+            workMode: 'remote',
             title: 'Product Designer',
             description: 'Design the whole experience — capture, browse, search. Calm and tactile, not another AI app.',
             skills: ['UI Design', 'Figma', 'User Research'],
@@ -253,6 +298,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-murmur-marketing',
+            workMode: 'remote',
             title: 'Marketing Lead',
             description: 'Name the launch, write the story, build the waitlist. Privacy is the hook; warmth is the voice.',
             skills: ['Marketing', 'Copywriting', 'Branding'],
@@ -275,6 +321,7 @@ export function makeSeedData(): AppData {
         roles: [
           {
             id: 'r-trail-mech',
+            workMode: 'in-person',
             title: 'Mechanical Engineer',
             description: 'IP67 enclosure that survives four seasons, UV, and curious bears. Pole and tree mounting.',
             skills: ['Mechanical Engineering', 'CAD', 'Prototyping'],
@@ -283,6 +330,7 @@ export function makeSeedData(): AppData {
           },
           {
             id: 'r-trail-civil',
+            workMode: 'in-person',
             title: 'Civil Engineer',
             description: 'Site planning for 40 beacon installs across the trail network, with the land trust and rangers.',
             skills: ['Civil Engineering', 'Project Management'],
@@ -292,6 +340,129 @@ export function makeSeedData(): AppData {
         ],
         createdAt: now - 5 * DAY,
         hue: 80,
+      },
+      {
+        id: 'p-harborshop',
+        ownerId: 'u-nate',
+        title: 'Harbor Workshop — Community Fab Lab Rebuild',
+        tagline: 'Turning a flooded waterfront warehouse into a free neighborhood makerspace.',
+        description:
+          'Last winter a storm surge wrecked the community workshop that taught two hundred kids a year to build things. We have the lease, the insurance payout, and a warehouse full of donated machines — what we need is the engineering to bring it back better.\n\nThe work is hands-on and local: recommissioning CNC and woodshop equipment, planning shop power, and building the little software systems (member check-in, tool reservations) that keep a volunteer-run space from descending into chaos.\n\nWeekend work parties, free pizza, and the best kind of tired at the end of the day.',
+        category: 'Community',
+        tags: ['Makerspace', 'Education', 'Hands-on'],
+        roles: [
+          {
+            id: 'r-harbor-mech',
+            workMode: 'in-person',
+            title: 'Mechanical Engineer',
+            description: 'Recommission the donated CNC router and woodshop machines; design safe layouts, guarding, and dust collection.',
+            skills: ['Mechanical Engineering', 'Prototyping', 'CAD'],
+            slots: 1,
+            filledBy: [],
+          },
+          {
+            id: 'r-harbor-sw',
+            workMode: 'in-person',
+            title: 'Software Engineer',
+            description: 'Build the on-site member check-in kiosk and the tool-reservation board that runs on a shop tablet.',
+            skills: ['Software Engineering', 'TypeScript', 'React'],
+            slots: 1,
+            filledBy: [],
+          },
+          {
+            id: 'r-harbor-ee',
+            workMode: 'hybrid',
+            title: 'Electrical Engineer',
+            description: 'Plan shop power distribution and wire up the electronics bench. Site visits for surveys, design from home.',
+            skills: ['Electrical Engineering'],
+            slots: 1,
+            filledBy: [],
+          },
+        ],
+        createdAt: now - 4 * DAY,
+        hue: 215,
+      },
+    ],
+    tools: [
+      {
+        id: 't-prusa',
+        ownerId: 'u-marcus',
+        name: 'Prusa MK4 3D Printer',
+        category: '3D Printing',
+        description:
+          'Well-tuned MK4 with a 0.4mm nozzle and a stash of PLA/PETG. Happy to run prints for you or walk you through slicing your first part.',
+        ratePerDay: 0,
+        createdAt: now - 12 * DAY,
+      },
+      {
+        id: 't-welder',
+        ownerId: 'u-nate',
+        name: 'Miller MIG Welder (220V)',
+        category: 'Welding & Metalwork',
+        description:
+          'Millermatic 211 at the workshop, with gloves, helmet, and a welding table. First-timers welcome — I will give you a 20-minute safety intro before you strike an arc.',
+        ratePerDay: 15,
+        createdAt: now - 8 * DAY,
+      },
+      {
+        id: 't-cnc',
+        ownerId: 'u-nate',
+        name: 'Shapeoko CNC Router',
+        category: 'CNC & Machining',
+        description:
+          'Freshly recommissioned after the flood. Cuts wood, plastics, and soft aluminum up to 16" x 16". Bring your own endmills or rent ours.',
+        ratePerDay: 25,
+        createdAt: now - 4 * DAY,
+      },
+      {
+        id: 't-scope',
+        ownerId: 'u-priya',
+        name: 'Rigol Oscilloscope + Logic Analyzer',
+        category: 'Electronics',
+        description:
+          'DS1054Z (hacked to 100MHz, naturally) plus a 16-channel logic analyzer. Great for debugging your first PCB bring-up. Borrow it for a week, no charge.',
+        ratePerDay: 0,
+        createdAt: now - 10 * DAY,
+      },
+      {
+        id: 't-resin',
+        ownerId: 'u-leo',
+        name: 'Formlabs Form 3 Resin Printer',
+        category: '3D Printing',
+        description:
+          'High-detail SLA prints for enclosures, surgical-grade prototypes, and miniatures. Rate covers resin and wash/cure time. I run the prints — you get the parts.',
+        ratePerDay: 20,
+        createdAt: now - 6 * DAY,
+      },
+      {
+        id: 't-sewing',
+        ownerId: 'u-sofia',
+        name: 'Juki Industrial Sewing Machine',
+        category: 'Textiles',
+        description:
+          'Walking-foot machine that goes through canvas, webbing, and leather like butter. Perfect for soft goods prototypes, straps, and covers.',
+        ratePerDay: 10,
+        createdAt: now - 3 * DAY,
+      },
+      {
+        id: 't-saw',
+        ownerId: 'u-nate',
+        name: 'SawStop Table Saw + Woodshop',
+        category: 'Woodworking',
+        description:
+          'Full woodshop access at Harbor Workshop: table saw, bandsaw, planer, and dust collection. Day rate supports the space.',
+        ratePerDay: 30,
+        createdAt: now - 2 * DAY,
+      },
+      {
+        id: 't-truck',
+        ownerId: 'u-amara',
+        name: 'Pickup Truck + Tow Hitch',
+        category: 'Heavy Equipment',
+        description:
+          'F-150 for hauling lumber, machines, or a small trailer. I usually drive — gas money appreciated for long hauls.',
+        ratePerDay: 0,
+        createdAt: now - 1 * DAY,
       },
     ],
     applications: [
@@ -346,4 +517,50 @@ export const SKILL_SUGGESTIONS = [
   'C/C++',
 ]
 
-export const CATEGORIES = ['Climate', 'Health', 'Community', 'Tools', 'Hardware', 'Education', 'Art']
+export const INTEREST_SUGGESTIONS = [
+  'Climate Tech',
+  'Open Source',
+  'Robotics',
+  'Accessibility',
+  'Education',
+  'Health Tech',
+  'Civic Tech',
+  'Space',
+  'Privacy',
+  'Art & Design',
+  'Music',
+  'Outdoors',
+]
+
+export const TOOL_CATEGORIES = [
+  '3D Printing',
+  'CNC & Machining',
+  'Welding & Metalwork',
+  'Woodworking',
+  'Electronics',
+  'Textiles',
+  'Photo & Video',
+  'Heavy Equipment',
+  'Hand & Power Tools',
+  'Other',
+]
+
+export const CATEGORIES = [
+  'Art',
+  'Climate',
+  'Community',
+  'Data & Research',
+  'Education',
+  'Finance',
+  'Food & Agriculture',
+  'Gaming',
+  'Hardware',
+  'Health',
+  'Infrastructure',
+  'Media & Journalism',
+  'Policy & Advocacy',
+  'Science',
+  'Social Good',
+  'Tools',
+  'Transportation',
+]

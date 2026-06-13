@@ -1,12 +1,25 @@
 export interface User {
   id: string
   name: string
+  email: string
   headline: string
   location: string
   bio: string
   skills: string[]
+  interests?: string[]
+  school?: string
+  resume?: Resume
   hue: number
 }
+
+/** An uploaded resume, stored inline as a data URL since there is no backend. */
+export interface Resume {
+  fileName: string
+  dataUrl: string
+  uploadedAt: number
+}
+
+export type WorkMode = 'remote' | 'hybrid' | 'in-person'
 
 export interface Role {
   id: string
@@ -15,6 +28,7 @@ export interface Role {
   skills: string[]
   slots: number
   filledBy: string[]
+  workMode: WorkMode
 }
 
 export interface Project {
@@ -42,9 +56,21 @@ export interface Application {
   createdAt: number
 }
 
+export interface ToolListing {
+  id: string
+  ownerId: string
+  name: string
+  category: string
+  description: string
+  /** Dollars per day to borrow it; 0 means free to borrow. */
+  ratePerDay: number
+  createdAt: number
+}
+
 export interface AppData {
   currentUserId: string
   users: User[]
   projects: Project[]
   applications: Application[]
+  tools: ToolListing[]
 }

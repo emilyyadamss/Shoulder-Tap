@@ -1,25 +1,55 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../store'
 import { ProjectCard, openSlots } from '../components/ProjectCard'
-import { EmptyState, SearchIcon } from '../components/ui'
+import { EmptyState, SearchIcon, WORK_MODES } from '../components/ui'
+import { coordsFor, milesBetween } from '../geo'
+import type { WorkMode } from '../types'
+
+const RADIUS_OPTIONS = [25, 50, 100, 250]
 
 export function Discover() {
   const { data, currentUser } = useStore()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<string | null>(null)
+  const [workMode, setWorkMode] = useState<WorkMode | null>(null)
   const [forMe, setForMe] = useState(false)
+  const [nearMe, setNearMe] = useState(false)
+  const [radius, setRadius] = useState(100)
+
+  const myCoords = coordsFor(currentUser.location)
 
   const categories = useMemo(
     () => [...new Set(data.projects.map((p) => p.category))].sort(),
     [data.projects],
   )
 
-  const projects = useMemo(() => {
+  const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     const mySkills = new Set(currentUser.skills)
-    return data.projects
-      .filter((p) => {
+    const entries = data.projects
+      .map((p) => {
+        const owner = data.users.find((u) => u.id === p.ownerId)
+        const distance =
+          owner && owner.id !== currentUser.id
+            ? milesBetween(currentUser.location, owner.location)
+            : null
+        return { project: p, distance }
+      })
+      .filter(({ project: p, distance }) => {
         if (category && p.category !== category) return false
+        if (workMode) {
+          const hasOpenMode = p.roles.some(
+            (r) => r.filledBy.length < r.slots && r.workMode === workMode,
+          )
+          if (!hasOpenMode) return false
+        }
+        if (nearMe) {
+          const hasLocalRole = p.roles.some(
+            (r) => r.filledBy.length < r.slots && r.workMode !== 'remote',
+          )
+          if (!hasLocalRole) return false
+          if (distance === null || distance > radius) return false
+        }
         if (forMe) {
           const matches = p.roles.some(
             (r) => r.filledBy.length < r.slots && r.skills.some((s) => mySkills.has(s)),
@@ -39,8 +69,12 @@ export function Discover() {
           .toLowerCase()
         return haystack.includes(q)
       })
-      .sort((a, b) => b.createdAt - a.createdAt)
-  }, [data.projects, query, category, forMe, currentUser.skills])
+    return entries.sort((a, b) =>
+      nearMe
+        ? (a.distance ?? Infinity) - (b.distance ?? Infinity)
+        : b.project.createdAt - a.project.createdAt,
+    )
+  }, [data.projects, data.users, query, category, workMode, nearMe, radius, forMe, currentUser])
 
   const totalOpen = data.projects.reduce((n, p) => n + openSlots(p), 0)
 
@@ -76,7 +110,44 @@ export function Discover() {
           />
           Matches my skills
         </label>
+        <label className="switch-label">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={nearMe}
+            className={`switch${nearMe ? ' on' : ''}`}
+            onClick={() => setNearMe((v) => !v)}
+          />
+          Near me
+        </label>
+        {nearMe && (
+          <select
+            className="input radius-select"
+            value={radius}
+            onChange={(e) => setRadius(Number(e.target.value))}
+            aria-label="Search radius"
+          >
+            {RADIUS_OPTIONS.map((r) => (
+              <option key={r} value={r}>
+                within {r} mi
+              </option>
+            ))}
+          </select>
+        )}
       </div>
+
+      {nearMe && !myCoords && (
+        <p className="geo-hint">
+          We couldn’t place “{currentUser.location}” on the map. Set your profile location to a
+          nearby major city (e.g. “Boston, MA”) to find in-person projects around you.
+        </p>
+      )}
+      {nearMe && myCoords && (
+        <p className="geo-hint">
+          Showing projects with open in-person or hybrid roles within {radius} miles of{' '}
+          {currentUser.location}, nearest first.
+        </p>
+      )}
 
       <div className="filter-row">
         <button
@@ -96,14 +167,36 @@ export function Discover() {
         ))}
       </div>
 
-      {projects.length === 0 ? (
-        <EmptyState icon="🔍" title="No projects match">
-          <p>Try a different search, or clear the filters above.</p>
+      <div className="filter-row">
+        <button
+          className={`tag${workMode === null ? ' selected' : ''}`}
+          onClick={() => setWorkMode(null)}
+        >
+          Any location
+        </button>
+        {WORK_MODES.map((m) => (
+          <button
+            key={m.value}
+            className={`tag${workMode === m.value ? ' selected' : ''}`}
+            onClick={() => setWorkMode((cur) => (cur === m.value ? null : m.value))}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      {results.length === 0 ? (
+        <EmptyState title={nearMe ? 'Nothing in-person nearby' : 'No projects match'}>
+          <p>
+            {nearMe
+              ? 'Try widening the radius, or switch off “Near me” to browse remote-friendly roles.'
+              : 'Try a different search, or clear the filters above.'}
+          </p>
         </EmptyState>
       ) : (
         <div className="grid">
-          {projects.map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} />
+          {results.map(({ project: p, distance }, i) => (
+            <ProjectCard key={p.id} project={p} index={i} distance={nearMe ? distance : undefined} />
           ))}
         </div>
       )}

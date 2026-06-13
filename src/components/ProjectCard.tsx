@@ -1,16 +1,33 @@
 import { Link } from 'react-router-dom'
-import type { Project } from '../types'
+import type { Project, WorkMode } from '../types'
 import { timeAgo, useStore } from '../store'
-import { Avatar, cover } from './ui'
+import { formatDistance } from '../geo'
+import { Avatar, WORK_MODES, WorkModeBadge, cover } from './ui'
 
 export function openSlots(project: Project): number {
   return project.roles.reduce((n, r) => n + Math.max(0, r.slots - r.filledBy.length), 0)
 }
 
-export function ProjectCard({ project, index = 0 }: { project: Project; index?: number }) {
+function openModes(project: Project): WorkMode[] {
+  const present = new Set(
+    project.roles.filter((r) => r.filledBy.length < r.slots).map((r) => r.workMode),
+  )
+  return WORK_MODES.filter((m) => present.has(m.value)).map((m) => m.value)
+}
+
+export function ProjectCard({
+  project,
+  index = 0,
+  distance,
+}: {
+  project: Project
+  index?: number
+  distance?: number | null
+}) {
   const { data, currentUser } = useStore()
   const owner = data.users.find((u) => u.id === project.ownerId)
   const open = openSlots(project)
+  const modes = openModes(project)
   const mySkills = new Set(currentUser.skills)
 
   return (
@@ -34,6 +51,16 @@ export function ProjectCard({ project, index = 0 }: { project: Project; index?: 
               )
             })}
           </div>
+          {(modes.length > 0 || typeof distance === 'number') && (
+            <div className="card-modes">
+              {modes.map((m) => (
+                <WorkModeBadge key={m} mode={m} />
+              ))}
+              {typeof distance === 'number' && (
+                <span className="workmode workmode-distance">{formatDistance(distance)}</span>
+              )}
+            </div>
+          )}
           <div className="card-foot">
             {owner && <Avatar user={owner} size={26} />}
             <span>{owner?.name}</span>

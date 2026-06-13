@@ -8,10 +8,21 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { AppData, Application, ApplicationStatus, Project, User } from './types'
+import type { AppData, Application, ApplicationStatus, Project, ToolListing, User } from './types'
 import { makeSeedData } from './data/seed'
 
 const STORAGE_KEY = 'shoulder-tap-data-v1'
+const AUTH_KEY = 'shoulder-tap-auth-v1'
+
+/**
+ * Demo password shared by every seeded account. There is no backend, so this
+ * stands in for a real credential check — see the hint on the login page.
+ */
+export const DEMO_PASSWORD = 'shouldertap'
+
+export type SignInResult =
+  | { ok: true; user: User }
+  | { ok: false; error: string }
 
 export interface Toast {
   id: string
@@ -22,14 +33,24 @@ export interface Toast {
 interface Store {
   data: AppData
   currentUser: User
+  authedUserId: string | null
   toasts: Toast[]
+  signIn: (email: string, password: string) => SignInResult
+  completeSignIn: (userId: string) => void
+  signOut: () => void
   dismissToast: (id: string) => void
   notify: (message: string, kind?: Toast['kind']) => void
   addProject: (p: Omit<Project, 'id' | 'ownerId' | 'createdAt' | 'hue'>) => Project
+  addTool: (t: Omit<ToolListing, 'id' | 'ownerId' | 'createdAt'>) => void
+  removeTool: (toolId: string) => void
   apply: (projectId: string, roleId: string, message: string) => void
   withdraw: (applicationId: string) => void
   decideApplication: (applicationId: string, status: ApplicationStatus) => void
-  updateProfile: (patch: Partial<Pick<User, 'name' | 'headline' | 'location' | 'bio' | 'skills'>>) => void
+  updateProfile: (
+    patch: Partial<
+      Pick<User, 'name' | 'headline' | 'location' | 'bio' | 'skills' | 'interests' | 'school' | 'resume'>
+    >,
+  ) => void
   resetData: () => void
 }
 
@@ -38,11 +59,64 @@ const StoreContext = createContext<Store | null>(null)
 function loadData(): AppData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as AppData
+    if (raw) return migrate(JSON.parse(raw) as AppData)
   } catch {
     // fall through to seed
   }
   return makeSeedData()
+}
+
+/**
+ * Backfill fields added after a user's data was first seeded into localStorage.
+ * Without this, accounts stored before the `email` field existed have no email,
+ * and sign-in would throw on `u.email.toLowerCase()`.
+ */
+function migrate(data: AppData): AppData {
+  const seed = makeSeedData()
+  const seedEmailById = new Map(seed.users.map((u) => [u.id, u.email]))
+  let changed = false
+  let users = data.users.map((u) => {
+    if (u.email) return u
+    changed = true
+    const fallback = `${u.name.split(' ')[0].toLowerCase()}@shouldertap.dev`
+    return { ...u, email: seedEmailById.get(u.id) ?? fallback }
+  })
+  let projects = data.projects.map((p) => {
+    if (p.roles.every((r) => r.workMode)) return p
+    changed = true
+    return {
+      ...p,
+      roles: p.roles.map((r) => (r.workMode ? r : { ...r, workMode: 'remote' as const })),
+    }
+  })
+  // Seed entities introduced after this data was first stored.
+  const userIds = new Set(users.map((u) => u.id))
+  const newUsers = seed.users.filter((u) => !userIds.has(u.id))
+  const projectIds = new Set(projects.map((p) => p.id))
+  const newProjects = seed.projects.filter((p) => !projectIds.has(p.id))
+  if (newUsers.length > 0) {
+    users = [...users, ...newUsers]
+    changed = true
+  }
+  if (newProjects.length > 0) {
+    projects = [...projects, ...newProjects]
+    changed = true
+  }
+  // Tool sharing shipped after launch; older stored data has no `tools` array.
+  let tools = data.tools
+  if (!tools) {
+    tools = seed.tools
+    changed = true
+  }
+  return changed ? { ...data, users, projects, tools } : data
+}
+
+function loadAuth(): string | null {
+  try {
+    return localStorage.getItem(AUTH_KEY)
+  } catch {
+    return null
+  }
 }
 
 let idCounter = 0
@@ -53,12 +127,21 @@ export function uid(prefix: string): string {
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppData>(loadData)
+  const [authedUserId, setAuthedUserId] = useState<string | null>(loadAuth)
   const [toasts, setToasts] = useState<Toast[]>([])
   const timersRef = useRef<number[]>([])
+
+  const authedUserIdRef = useRef(authedUserId)
+  authedUserIdRef.current = authedUserId
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
   }, [data])
+
+  useEffect(() => {
+    if (authedUserId) localStorage.setItem(AUTH_KEY, authedUserId)
+    else localStorage.removeItem(AUTH_KEY)
+  }, [authedUserId])
 
   useEffect(() => {
     const timers = timersRef.current
@@ -95,6 +178,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     [],
   )
+
+  const addTool = useCallback((t: Omit<ToolListing, 'id' | 'ownerId' | 'createdAt'>) => {
+    setData((d) => {
+      const tool: ToolListing = {
+        ...t,
+        id: uid('t'),
+        ownerId: d.currentUserId,
+        createdAt: Date.now(),
+      }
+      return { ...d, tools: [tool, ...d.tools] }
+    })
+  }, [])
+
+  const removeTool = useCallback((toolId: string) => {
+    setData((d) => ({ ...d, tools: d.tools.filter((t) => t.id !== toolId) }))
+  }, [])
 
   const apply = useCallback((projectId: string, roleId: string, message: string) => {
     setData((d) => {
@@ -145,7 +244,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateProfile = useCallback(
-    (patch: Partial<Pick<User, 'name' | 'headline' | 'location' | 'bio' | 'skills'>>) => {
+    (
+      patch: Partial<
+        Pick<User, 'name' | 'headline' | 'location' | 'bio' | 'skills' | 'interests' | 'school' | 'resume'>
+      >,
+    ) => {
       setData((d) => ({
         ...d,
         users: d.users.map((u) => (u.id === d.currentUserId ? { ...u, ...patch } : u)),
@@ -154,8 +257,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [],
   )
 
+  const signIn = useCallback(
+    (email: string, password: string): SignInResult => {
+      const normalized = email.trim().toLowerCase()
+      const user = data.users.find((u) => u.email?.toLowerCase() === normalized)
+      if (!user || password !== DEMO_PASSWORD) {
+        return { ok: false, error: 'That email and password don’t match an account.' }
+      }
+      return { ok: true, user }
+    },
+    [data.users],
+  )
+
+  const completeSignIn = useCallback((userId: string) => {
+    setAuthedUserId(userId)
+    setData((d) => ({ ...d, currentUserId: userId }))
+  }, [])
+
+  const signOut = useCallback(() => {
+    setAuthedUserId(null)
+  }, [])
+
   const resetData = useCallback(() => {
-    setData(makeSeedData())
+    setData(() => {
+      const seed = makeSeedData()
+      const authed = authedUserIdRef.current
+      return authed ? { ...seed, currentUserId: authed } : seed
+    })
   }, [])
 
   const currentUser = useMemo(
@@ -167,10 +295,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     () => ({
       data,
       currentUser,
+      authedUserId,
       toasts,
+      signIn,
+      completeSignIn,
+      signOut,
       dismissToast,
       notify,
       addProject,
+      addTool,
+      removeTool,
       apply,
       withdraw,
       decideApplication,
@@ -180,10 +314,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [
       data,
       currentUser,
+      authedUserId,
       toasts,
+      signIn,
+      completeSignIn,
+      signOut,
       dismissToast,
       notify,
       addProject,
+      addTool,
+      removeTool,
       apply,
       withdraw,
       decideApplication,

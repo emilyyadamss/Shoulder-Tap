@@ -20,7 +20,10 @@ export function People() {
     return data.users.filter((u) => {
       if (skill && !u.skills.includes(skill)) return false
       if (!q) return true
-      return [u.name, u.headline, u.location, u.bio, ...u.skills].join(' ').toLowerCase().includes(q)
+      return [u.name, u.headline, u.location, u.bio, u.school ?? '', ...u.skills, ...(u.interests ?? [])]
+        .join(' ')
+        .toLowerCase()
+        .includes(q)
     })
   }, [data.users, query, skill])
 
@@ -61,7 +64,7 @@ export function People() {
       </div>
 
       {people.length === 0 ? (
-        <EmptyState icon="🫥" title="Nobody matches">
+        <EmptyState title="Nobody matches">
           <p>Try a different search or skill filter.</p>
         </EmptyState>
       ) : (

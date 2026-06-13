@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { timeAgo, useStore } from '../store'
 import type { Role } from '../types'
-import { Avatar, EmptyState, Modal, PersonLink, cover } from '../components/ui'
+import { Avatar, EmptyState, Modal, PersonLink, WorkModeBadge, cover } from '../components/ui'
+import { formatDistance, milesBetween } from '../geo'
 
 export function ProjectDetail() {
   const { id } = useParams()
@@ -14,7 +15,7 @@ export function ProjectDetail() {
   if (!project) {
     return (
       <div className="container">
-        <EmptyState icon="🤷" title="Project not found">
+        <EmptyState title="Project not found">
           <p>
             It may have been removed. <Link to="/" style={{ textDecoration: 'underline' }}>Back to Discover</Link>
           </p>
@@ -32,6 +33,9 @@ export function ProjectDetail() {
   const pendingApps = projectApps.filter((a) => a.status === 'pending')
   const mySkills = new Set(currentUser.skills)
 
+  const hasLocalRole = project.roles.some((r) => r.workMode !== 'remote')
+  const distance = !isOwner && hasLocalRole ? milesBetween(currentUser.location, owner.location) : null
+
   const team = [
     { user: owner, label: 'Project lead' },
     ...project.roles.flatMap((r) =>
@@ -45,7 +49,7 @@ export function ProjectDetail() {
   function submitApplication() {
     if (!applyingTo || !project) return
     apply(project.id, applyingTo.id, message.trim())
-    notify(`Application sent for ${applyingTo.title} 🎉`)
+    notify(`Application sent for ${applyingTo.title}`)
     setApplyingTo(null)
     setMessage('')
   }
@@ -63,6 +67,12 @@ export function ProjectDetail() {
           <PersonLink user={owner} />
           <span className="divider-dot" />
           <span>Posted {timeAgo(project.createdAt)}</span>
+          {distance !== null && (
+            <>
+              <span className="divider-dot" />
+              <span title={`Based in ${owner.location}`}>{formatDistance(distance)}</span>
+            </>
+          )}
           <span className="divider-dot" />
           {project.tags.map((t) => (
             <span key={t} className="tag">
@@ -87,7 +97,7 @@ export function ProjectDetail() {
               </h2>
               {projectApps.length === 0 ? (
                 <div className="card">
-                  <EmptyState icon="📭" title="No applications yet">
+                  <EmptyState title="No applications yet">
                     <p>Share your project — applicants will show up here.</p>
                   </EmptyState>
                 </div>
@@ -119,7 +129,7 @@ export function ProjectDetail() {
                                 className="btn btn-success btn-sm"
                                 onClick={() => {
                                   decideApplication(a.id, 'accepted')
-                                  notify(`${applicant.name} joined as ${role.title} 🙌`)
+                                  notify(`${applicant.name} joined as ${role.title}`)
                                 }}
                               >
                                 Accept
@@ -162,6 +172,7 @@ export function ProjectDetail() {
                     </span>
                   </div>
                   <p className="role-desc">{role.description}</p>
+                  <WorkModeBadge mode={role.workMode} location={owner.location} />
                   <div className="card-roles">
                     {role.skills.map((s) => (
                       <span key={s} className={`tag${mySkills.has(s) ? ' tag-match' : ''}`}>

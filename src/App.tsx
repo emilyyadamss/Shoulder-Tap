@@ -8,14 +8,16 @@ import { ProjectDetail } from './pages/ProjectDetail'
 import { NewProject } from './pages/NewProject'
 import { People } from './pages/People'
 import { PersonDetail } from './pages/PersonDetail'
+import { Tools } from './pages/Tools'
 import { Dashboard } from './pages/Dashboard'
+import { Login } from './pages/Login'
 
 function Footer() {
   const { resetData, notify } = useStore()
   return (
     <div className="container">
       <footer className="footer">
-        <span>👋 Shoulder Tap — find the missing person for your project.</span>
+        <span>Shoulder Tap — find the missing person for your project.</span>
         <button
           className="link-btn"
           onClick={() => {
@@ -48,6 +50,7 @@ function Pages() {
         <Route path="/new" element={<NewProject />} />
         <Route path="/people" element={<People />} />
         <Route path="/people/:id" element={<PersonDetail />} />
+        <Route path="/tools" element={<Tools />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<Discover />} />
       </Routes>
@@ -55,18 +58,33 @@ function Pages() {
   )
 }
 
+function Authenticated() {
+  const { authedUserId } = useStore()
+  if (!authedUserId) {
+    return (
+      <>
+        <Login />
+        <Toasts />
+      </>
+    )
+  }
+  return (
+    <HashRouter>
+      <div className="shell">
+        <ScrollToTop />
+        <Navbar />
+        <Pages />
+        <Footer />
+        <Toasts />
+      </div>
+    </HashRouter>
+  )
+}
+
 export default function App() {
   return (
     <StoreProvider>
-      <HashRouter>
-        <div className="shell">
-          <ScrollToTop />
-          <Navbar />
-          <Pages />
-          <Footer />
-          <Toasts />
-        </div>
-      </HashRouter>
+      <Authenticated />
     </StoreProvider>
   )
 }

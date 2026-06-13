@@ -27,7 +27,7 @@ export function Dashboard() {
         <h2 className="section-title">Projects you lead</h2>
         {myProjects.length === 0 ? (
           <div className="card">
-            <EmptyState icon="🛠️" title="No projects yet">
+            <EmptyState title="No projects yet">
               <p>
                 Have something brewing?{' '}
                 <Link to="/new" style={{ textDecoration: 'underline' }}>
@@ -74,7 +74,7 @@ export function Dashboard() {
         <h2 className="section-title">Your applications</h2>
         {myApplications.length === 0 ? (
           <div className="card">
-            <EmptyState icon="🧭" title="You haven't applied anywhere yet">
+            <EmptyState title="You haven't applied anywhere yet">
               <p>
                 <Link to="/" style={{ textDecoration: 'underline' }}>
                   Browse projects

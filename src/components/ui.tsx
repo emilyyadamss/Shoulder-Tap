@@ -1,7 +1,29 @@
 import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import type { User } from '../types'
+import type { User, WorkMode } from '../types'
 import { useStore } from '../store'
+
+export const WORK_MODES: { value: WorkMode; label: string }[] = [
+  { value: 'remote', label: 'Remote' },
+  { value: 'hybrid', label: 'Hybrid' },
+  { value: 'in-person', label: 'In person' },
+]
+
+export function workModeMeta(mode: WorkMode) {
+  return WORK_MODES.find((m) => m.value === mode) ?? WORK_MODES[0]
+}
+
+export function WorkModeBadge({ mode, location }: { mode: WorkMode; location?: string }) {
+  const meta = workModeMeta(mode)
+  const showLocation = location && mode !== 'remote'
+  return (
+    <span className={`workmode workmode-${mode}`} title={meta.label}>
+      {meta.label}
+      {showLocation ? ` · ${location}` : ''}
+    </span>
+  )
+}
 
 export function Avatar({ user, size = 36 }: { user: User; size?: number }) {
   const initials = user.name
@@ -41,11 +63,13 @@ export function Modal({
   title,
   subtitle,
   onClose,
+  wide = false,
   children,
 }: {
   title: string
   subtitle?: string
   onClose: () => void
+  wide?: boolean
   children: ReactNode
 }) {
   useEffect(() => {
@@ -60,14 +84,17 @@ export function Modal({
     }
   }, [onClose])
 
-  return (
+  // Portal to <body>: pages animate with a transform, which would otherwise
+  // trap this fixed overlay in their stacking context, under the navbar.
+  return createPortal(
     <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title}>
+      <div className={`modal${wide ? ' modal-wide' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
         <h2>{title}</h2>
         {subtitle && <p className="modal-sub">{subtitle}</p>}
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -86,18 +113,9 @@ export function Toasts() {
   )
 }
 
-export function EmptyState({
-  icon,
-  title,
-  children,
-}: {
-  icon: string
-  title: string
-  children?: ReactNode
-}) {
+export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="empty">
-      <div className="empty-icon">{icon}</div>
       <h3>{title}</h3>
       {children}
     </div>

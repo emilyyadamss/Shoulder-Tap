@@ -1,9 +1,13 @@
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useStore } from '../store'
-import { SKILL_SUGGESTIONS } from '../data/seed'
+import { INTEREST_SUGGESTIONS, SKILL_SUGGESTIONS } from '../data/seed'
+import type { Resume } from '../types'
 import { Avatar, EmptyState, Modal } from '../components/ui'
 import { ProjectCard } from '../components/ProjectCard'
+
+/** Resumes live in localStorage as data URLs, so keep uploads small. */
+const MAX_RESUME_BYTES = 2 * 1024 * 1024
 
 export function PersonDetail() {
   const { id } = useParams()
@@ -14,7 +18,7 @@ export function PersonDetail() {
   if (!user) {
     return (
       <div className="container">
-        <EmptyState icon="🫥" title="Person not found">
+        <EmptyState title="Person not found">
           <p>
             <Link to="/people" style={{ textDecoration: 'underline' }}>Back to People</Link>
           </p>
@@ -47,14 +51,43 @@ export function PersonDetail() {
               </button>
             )}
           </div>
+          {user.school && (
+            <p style={{ marginTop: 6, color: 'var(--ink-soft)', fontSize: 14 }}>
+              {user.school}
+            </p>
+          )}
           <p style={{ marginTop: 14, color: 'var(--ink-soft)', maxWidth: 620 }}>{user.bio}</p>
-          <div className="card-roles" style={{ marginTop: 16 }}>
-            {user.skills.map((s) => (
-              <span key={s} className="tag tag-accent">
-                {s}
-              </span>
-            ))}
-          </div>
+          {user.skills.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <div className="profile-section-label">Skills</div>
+              <div className="card-roles">
+                {user.skills.map((s) => (
+                  <span key={s} className="tag tag-accent">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {user.interests && user.interests.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <div className="profile-section-label">Interests</div>
+              <div className="card-roles">
+                {user.interests.map((s) => (
+                  <span key={s} className="tag">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {user.resume && (
+            <div style={{ marginTop: 18 }}>
+              <a className="btn btn-ghost btn-sm" href={user.resume.dataUrl} download={user.resume.fileName}>
+                Resume — {user.resume.fileName}
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
@@ -83,7 +116,7 @@ export function PersonDetail() {
       )}
 
       {ownedProjects.length === 0 && contributions.length === 0 && (
-        <EmptyState icon="🌱" title="Nothing here yet">
+        <EmptyState title="Nothing here yet">
           <p>{isMe ? 'Post a project or apply to one to get started.' : 'No projects yet.'}</p>
         </EmptyState>
       )}
@@ -96,11 +129,40 @@ export function PersonDetail() {
     const [name, setName] = useState(currentUser.name)
     const [headline, setHeadline] = useState(currentUser.headline)
     const [location, setLocation] = useState(currentUser.location)
+    const [school, setSchool] = useState(currentUser.school ?? '')
     const [bio, setBio] = useState(currentUser.bio)
     const [skills, setSkills] = useState<string[]>(currentUser.skills)
+    const [interests, setInterests] = useState<string[]>(currentUser.interests ?? [])
+    const [customInterest, setCustomInterest] = useState('')
+    const [resume, setResume] = useState<Resume | undefined>(currentUser.resume)
+    const [resumeError, setResumeError] = useState('')
+
+    function addCustomInterest() {
+      const value = customInterest.trim()
+      if (!value) return
+      setInterests((cur) =>
+        cur.some((i) => i.toLowerCase() === value.toLowerCase()) ? cur : [...cur, value],
+      )
+      setCustomInterest('')
+    }
+
+    function onResumeFile(e: ChangeEvent<HTMLInputElement>) {
+      const file = e.target.files?.[0]
+      e.target.value = ''
+      if (!file) return
+      if (file.size > MAX_RESUME_BYTES) {
+        setResumeError('That file is over 2 MB. Profiles are stored in your browser, so please upload a smaller file.')
+        return
+      }
+      setResumeError('')
+      const reader = new FileReader()
+      reader.onload = () =>
+        setResume({ fileName: file.name, dataUrl: reader.result as string, uploadedAt: Date.now() })
+      reader.readAsDataURL(file)
+    }
 
     return (
-      <Modal title="Edit profile" subtitle="Your skills drive role matching across the site." onClose={onClose}>
+      <Modal wide title="Edit profile" subtitle="Your skills drive role matching across the site." onClose={onClose}>
         <div className="field">
           <label>Name</label>
           <input value={name} onChange={(e) => setName(e.target.value)} />
@@ -114,6 +176,14 @@ export function PersonDetail() {
             <label>Location</label>
             <input value={location} onChange={(e) => setLocation(e.target.value)} />
           </div>
+        </div>
+        <div className="field">
+          <label>School</label>
+          <input
+            value={school}
+            onChange={(e) => setSchool(e.target.value)}
+            placeholder="e.g. University of Michigan — BSE Mechanical Engineering"
+          />
         </div>
         <div className="field">
           <label>Bio</label>
@@ -138,6 +208,53 @@ export function PersonDetail() {
             ))}
           </div>
         </div>
+        <div className="field">
+          <label>Interests</label>
+          <div className="skill-picker">
+            {[...new Set([...INTEREST_SUGGESTIONS, ...interests])].map((s) => (
+              <button
+                key={s}
+                type="button"
+                className={`tag${interests.includes(s) ? ' selected' : ''}`}
+                onClick={() =>
+                  setInterests((cur) =>
+                    cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s],
+                  )
+                }
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <input
+            value={customInterest}
+            onChange={(e) => setCustomInterest(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                addCustomInterest()
+              }
+            }}
+            onBlur={addCustomInterest}
+            placeholder="Add your own — press Enter"
+          />
+        </div>
+        <div className="field">
+          <label>Resume</label>
+          {resume ? (
+            <div className="resume-row">
+              <a href={resume.dataUrl} download={resume.fileName}>
+                {resume.fileName}
+              </a>
+              <button type="button" className="link-btn" onClick={() => setResume(undefined)}>
+                Remove
+              </button>
+            </div>
+          ) : (
+            <input type="file" accept=".pdf,.doc,.docx,.txt,.md" onChange={onResumeFile} />
+          )}
+          {resumeError && <p className="hint" style={{ color: 'var(--accent)' }}>{resumeError}</p>}
+        </div>
         <div className="modal-actions">
           <button className="btn btn-ghost" onClick={onClose}>
             Cancel
@@ -150,10 +267,13 @@ export function PersonDetail() {
                 name: name.trim(),
                 headline: headline.trim(),
                 location: location.trim(),
+                school: school.trim() || undefined,
                 bio: bio.trim(),
                 skills,
+                interests,
+                resume,
               })
-              notify('Profile updated ✨')
+              notify('Profile updated')
               onClose()
             }}
           >
