@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useStore } from '../store'
 import { INTEREST_SUGGESTIONS, SKILL_SUGGESTIONS } from '../data/seed'
 import type { Resume } from '../types'
-import { resumeDownloadUrl, uploadResume } from '../lib/resume'
+import { resumeViewUrl, uploadResume } from '../lib/resume'
 import { Avatar, EmptyState, Modal } from '../components/ui'
 import { ProjectCard } from '../components/ProjectCard'
 
@@ -14,6 +14,7 @@ export function PersonDetail() {
   const { id } = useParams()
   const { data, currentUser, updateProfile, notify } = useStore()
   const [editing, setEditing] = useState(false)
+  const [viewingResume, setViewingResume] = useState<{ resume: Resume; url: string } | null>(null)
 
   const user = data.users.find((u) => u.id === id)
   if (!user) {
@@ -36,8 +37,8 @@ export function PersonDetail() {
 
   async function openResume(resume: Resume) {
     try {
-      const url = await resumeDownloadUrl(resume)
-      window.open(url, '_blank', 'noopener,noreferrer')
+      const url = await resumeViewUrl(resume)
+      setViewingResume({ resume, url })
     } catch {
       notify('Could not open that resume. Please try again.', 'info')
     }
@@ -92,9 +93,10 @@ export function PersonDetail() {
             </div>
           )}
           {user.resume && (
-            <div style={{ marginTop: 18 }}>
+            <div style={{ marginTop: 14 }}>
+              <div className="profile-section-label">Resume</div>
               <button className="btn btn-ghost btn-sm" onClick={() => openResume(user.resume!)}>
-                Resume — {user.resume.fileName}
+                {user.resume.fileName}
               </button>
             </div>
           )}
@@ -132,6 +134,28 @@ export function PersonDetail() {
       )}
 
       {editing && <EditProfileModal onClose={() => setEditing(false)} />}
+
+      {viewingResume && (
+        <Modal
+          wide
+          title={viewingResume.resume.fileName}
+          subtitle={`${user.name.split(' ')[0]}'s resume`}
+          onClose={() => setViewingResume(null)}
+        >
+          <iframe
+            src={viewingResume.url}
+            title={viewingResume.resume.fileName}
+            className="resume-preview"
+          />
+          <p className="hint" style={{ marginTop: 12 }}>
+            Can’t see it?{' '}
+            <a href={viewingResume.url} target="_blank" rel="noopener noreferrer">
+              Open in a new tab
+            </a>
+            .
+          </p>
+        </Modal>
+      )}
     </div>
   )
 
@@ -142,11 +166,21 @@ export function PersonDetail() {
     const [school, setSchool] = useState(currentUser.school ?? '')
     const [bio, setBio] = useState(currentUser.bio)
     const [skills, setSkills] = useState<string[]>(currentUser.skills)
+    const [customSkill, setCustomSkill] = useState('')
     const [interests, setInterests] = useState<string[]>(currentUser.interests ?? [])
     const [customInterest, setCustomInterest] = useState('')
     const [resume, setResume] = useState<Resume | undefined>(currentUser.resume)
     const [resumeError, setResumeError] = useState('')
     const [uploading, setUploading] = useState(false)
+
+    function addCustomSkill() {
+      const value = customSkill.trim()
+      if (!value) return
+      setSkills((cur) =>
+        cur.some((s) => s.toLowerCase() === value.toLowerCase()) ? cur : [...cur, value],
+      )
+      setCustomSkill('')
+    }
 
     function addCustomInterest() {
       const value = customInterest.trim()
@@ -222,6 +256,18 @@ export function PersonDetail() {
               </button>
             ))}
           </div>
+          <input
+            value={customSkill}
+            onChange={(e) => setCustomSkill(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                addCustomSkill()
+              }
+            }}
+            onBlur={addCustomSkill}
+            placeholder="Add your own — press Enter"
+          />
         </div>
         <div className="field">
           <label>Interests</label>

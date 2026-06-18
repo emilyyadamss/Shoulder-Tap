@@ -20,11 +20,11 @@ export async function uploadResume(userId: string, file: File): Promise<Resume> 
   return { fileName: file.name, path, uploadedAt: Date.now() }
 }
 
-/** Mint a short-lived signed URL that downloads the file under its original name. */
-export async function resumeDownloadUrl(resume: Resume): Promise<string> {
+/** Mint a short-lived signed URL for viewing the file inline (e.g. in an iframe). */
+export async function resumeViewUrl(resume: Resume): Promise<string> {
   const { data, error } = await supabase.storage
     .from(BUCKET)
-    .createSignedUrl(resume.path, 60, { download: resume.fileName })
-  if (error || !data) throw error ?? new Error('Could not create a download link.')
+    .createSignedUrl(resume.path, 300)
+  if (error || !data) throw error ?? new Error('Could not create a link.')
   return data.signedUrl
 }
