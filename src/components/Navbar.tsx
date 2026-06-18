@@ -15,7 +15,7 @@ export function Navbar() {
       <div className="container navbar-inner">
         <Link to="/" className="brand">
           <span className="brand-mark" aria-hidden="true" />
-          Shoulder Tap
+          Opened Role
         </Link>
         <nav className="nav-links">
           <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>

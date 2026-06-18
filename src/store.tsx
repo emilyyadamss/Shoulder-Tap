@@ -11,14 +11,14 @@ import {
 import type { AppData, Application, ApplicationStatus, Project, ToolListing, User } from './types'
 import { makeSeedData } from './data/seed'
 
-const STORAGE_KEY = 'shoulder-tap-data-v1'
-const AUTH_KEY = 'shoulder-tap-auth-v1'
+const STORAGE_KEY = 'opened-role-data-v1'
+const AUTH_KEY = 'opened-role-auth-v1'
 
 /**
  * Demo password shared by every seeded account. There is no backend, so this
  * stands in for a real credential check — see the hint on the login page.
  */
-export const DEMO_PASSWORD = 'shouldertap'
+export const DEMO_PASSWORD = 'openedrole'
 
 export type SignInResult =
   | { ok: true; user: User }
@@ -78,7 +78,7 @@ function migrate(data: AppData): AppData {
   let users = data.users.map((u) => {
     if (u.email) return u
     changed = true
-    const fallback = `${u.name.split(' ')[0].toLowerCase()}@shouldertap.dev`
+    const fallback = `${u.name.split(' ')[0].toLowerCase()}@openedrole.dev`
     return { ...u, email: seedEmailById.get(u.id) ?? fallback }
   })
   let projects = data.projects.map((p) => {

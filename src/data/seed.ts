@@ -10,7 +10,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-emily',
         name: 'Emily Adams',
-        email: 'emily@shouldertap.dev',
+        email: 'emily@openedrole.dev',
         headline: 'Full-stack Software Engineer',
         location: 'Portsmouth, NH',
         bio: 'I like building things end to end. From schema to pixels. Happiest on small, scrappy teams shipping something real. Looking to lend a hand on hardware or climate projects.',
@@ -22,7 +22,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-marcus',
         name: 'Marcus Okafor',
-        email: 'marcus@shouldertap.dev',
+        email: 'marcus@openedrole.dev',
         headline: 'Mechanical Engineer · Ex-SpaceX',
         location: 'Los Angeles, CA',
         bio: 'Ten years designing structures and mechanisms that have to survive the real world. I love early-stage projects where the CAD file is still a napkin sketch.',
@@ -34,7 +34,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-priya',
         name: 'Priya Raman',
-        email: 'priya@shouldertap.dev',
+        email: 'priya@openedrole.dev',
         headline: 'Embedded Systems Engineer',
         location: 'Austin, TX',
         bio: 'Firmware, PCBs, and anything with a microcontroller in it. I have bricked more dev boards than I can count and learned something every time.',
@@ -46,7 +46,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-sofia',
         name: 'Sofia Marchetti',
-        email: 'sofia@shouldertap.dev',
+        email: 'sofia@openedrole.dev',
         headline: 'Industrial & Product Designer',
         location: 'Brooklyn, NY',
         bio: 'I design objects people actually want to live with. Strong opinions about radii. Open to collaborating on hardware that deserves a beautiful enclosure.',
@@ -58,7 +58,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-dav',
         name: 'David Chen',
-        email: 'david@shouldertap.dev',
+        email: 'david@openedrole.dev',
         headline: 'Machine Learning Engineer',
         location: 'Seattle, WA',
         bio: 'I build models that run on real hardware with real constraints. Previously speech recognition at a big company; now I want to work on things I can point at.',
@@ -70,7 +70,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-amara',
         name: 'Amara Diallo',
-        email: 'amara@shouldertap.dev',
+        email: 'amara@openedrole.dev',
         headline: 'Civil & Structural Engineer',
         location: 'Chicago, IL',
         bio: 'Bridges, foundations, and load paths. I volunteer with disaster-relief rebuilds and want to bring structural rigor to community projects.',
@@ -82,7 +82,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-leo',
         name: 'Leo Tanaka',
-        email: 'leo@shouldertap.dev',
+        email: 'leo@openedrole.dev',
         headline: 'Biomedical Engineer & Tinkerer',
         location: 'San Diego, CA',
         bio: 'Medical devices by day, open-source prosthetics by night. Comfortable anywhere between a 510(k) submission and a soldering iron.',
@@ -93,7 +93,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-hannah',
         name: 'Hannah Berg',
-        email: 'hannah@shouldertap.dev',
+        email: 'hannah@openedrole.dev',
         headline: 'Growth Marketer & Writer',
         location: 'Denver, CO',
         bio: 'I help technical teams explain what they built and find the people who need it. Words, launches, and landing pages.',
@@ -104,7 +104,7 @@ export function makeSeedData(): AppData {
       {
         id: 'u-nate',
         name: 'Nate Sullivan',
-        email: 'nate@shouldertap.dev',
+        email: 'nate@openedrole.dev',
         headline: 'Community Makerspace Organizer',
         location: 'Boston, MA',
         bio: 'I run a volunteer-powered workshop on the waterfront. I can find a donated bandsaw anywhere in New England; now I need engineers to help put it all to work.',

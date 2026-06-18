@@ -17,7 +17,7 @@ function Footer() {
   return (
     <div className="container">
       <footer className="footer">
-        <span>Shoulder Tap Project. Find the missing person for your projects success.</span>
+        <span>Opened Role Project. Find the missing person for your projects success.</span>
         <button
           className="link-btn"
           onClick={() => {

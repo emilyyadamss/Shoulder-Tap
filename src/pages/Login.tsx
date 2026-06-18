@@ -29,7 +29,7 @@ export function Login() {
   const { signIn, completeSignIn, notify } = useStore()
 
   const [step, setStep] = useState<Step>('credentials')
-  const [email, setEmail] = useState('emily@shouldertap.dev')
+  const [email, setEmail] = useState('emily@openedrole.dev')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -150,7 +150,7 @@ export function Login() {
       <div className="auth-card">
         <div className="auth-brand">
           <span className="brand-mark" aria-hidden="true" />
-          Shoulder Tap
+          Opened Role
         </div>
 
         {step === 'credentials' ? (
@@ -169,7 +169,7 @@ export function Login() {
                   setEmail(e.target.value)
                   setError('')
                 }}
-                placeholder="you@shouldertap.dev"
+                placeholder="you@openedrole.dev"
               />
             </div>
 
@@ -200,12 +200,12 @@ export function Login() {
                 type="button"
                 className="link-btn"
                 onClick={() => {
-                  setEmail('emily@shouldertap.dev')
+                  setEmail('emily@openedrole.dev')
                   setPassword(DEMO_PASSWORD)
                   setError('')
                 }}
               >
-                emily@shouldertap.dev
+                emily@openedrole.dev
               </button>
               ) with the password <code>{DEMO_PASSWORD}</code>.
             </div>
